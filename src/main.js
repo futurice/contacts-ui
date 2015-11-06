@@ -7,7 +7,8 @@ const { div, span, a, table, thead, tbody, tr, th, td, img } =
 const Rx = Cycle.Rx;
 
 const FUM_BASEURL = "%%%FUM_BASEURL%%%";
-const DATA_URL = "/data.json";
+const CONTACTS_URL = "/contacts.json";
+const AVATARS_URL = "/avatars.json";
 
 const renderPhone = (phone) => {
   return a({ href: "tel:" + phone }, phone);
@@ -26,8 +27,14 @@ const separatedBy = (arr, sep) => {
   }
 };
 
-const dataImg = (d) => {
-  return img({ src: "data:image/png;base64," + d });
+const dataImg = (avatars, d) => {
+  const contents = avatars[d];
+
+  if (contents) {
+    return img({ src: "data:image/png;base64," + contents });
+  } else {
+    return span("");
+  }
 };
 
 const tri = (d, f) => {
@@ -41,9 +48,9 @@ const tri = (d, f) => {
   }
 };
 
-const flowdockAvatar = (t) => tri(t, (fd) =>
+const flowdockAvatar = (avatars, t) => tri(t, (fd) =>
   a({ href: "https://www.flowdock.com/app/private/" + fd.id }, [
-    dataImg(fd.avatar),
+    dataImg(avatars, fd.avatar),
   ]));
 
 const flowdock = (t) => tri(t, (fd) =>
@@ -51,9 +58,9 @@ const flowdock = (t) => tri(t, (fd) =>
     fd.nick,
   ]));
 
-const githubAvatar = (t) => tri(t, (gh) =>
+const githubAvatar = (avatars, t) => tri(t, (gh) =>
   a({ href: "https://github.com/" + gh.nick }, [
-    dataImg(gh.avatar),
+    dataImg(avatars, gh.avatar),
   ]));
 
 const github = (t) => tri(t, (gh) =>
@@ -88,54 +95,64 @@ const tableHeader =
     th("Title"),
   ]);
 
-const renderRow = (contact) =>
+const renderRow = (avatars) => (contact) =>
   tr([
-    td(dataImg(contact.thumb)),
+    td(dataImg(avatars, contact.thumb)),
     td(a({ href: FUM_BASEURL + "/fum/users/" + contact.login }, contact.name)),
     td(separatedBy(contact.phones.map(renderPhone), " ")),
-    td(flowdockAvatar(contact.flowdock)),
+    td(flowdockAvatar(avatars, contact.flowdock)),
     td(flowdock(contact.flowdock)),
-    td(githubAvatar(contact.github)),
+    td(githubAvatar(avatars, contact.github)),
     td(github(contact.github)),
     td(a({ href: "mailto:" + contact.email }, "email")),
     td(contact.title),
   ]);
 
-const render = (d) =>
+const render = (contacts, avatars) =>
   div([
     issueReports,
     filterBar,
     table([
       thead(tableHeader),
       tbody(
-        d.map(renderRow),
+        contacts.map(renderRow(avatars)),
       ),
     ]),
   ]);
 
 const main = (responses) => {
-  const request$ = Rx.Observable.just(DATA_URL);
+  const requests$ = Rx.Observable.merge(
+    Rx.Observable.just(CONTACTS_URL),
+    Rx.Observable.just(AVATARS_URL));
 
   const filter$ = responses.DOM
     .select(".filter").events("input")
     .map(ev => ev.target.value)
     .startWith("");
 
-  const data$ = responses.HTTP
+  const contacts$ = responses.HTTP
+    .filter(res$ => res$.request.indexOf(CONTACTS_URL) === 0)
     .switch()
     .map(res => res.body)
     .startWith([]);
 
-  const vtree$ = Rx.Observable.combineLatest(data$, filter$, (data, needle) => {
-    const data_ = needle.length < 3 ? data : data.filter(contact =>
-        contact.name.toLowerCase().indexOf(needle.toLowerCase()) !== -1);
+  const avatars$ = responses.HTTP
+    .filter(res$ => res$.request.indexOf(AVATARS_URL) === 0)
+    .switch()
+    .map(res => res.body)
+    .startWith({});
 
-    return render(data_);
-  });
+  const vtree$ = Rx.Observable.combineLatest(contacts$, avatars$, filter$,
+    (contacts, avatars, needle) => {
+      const contacts_ = needle.length < 3 ? contacts : contacts.filter(contact =>
+          contact.name.toLowerCase().indexOf(needle.toLowerCase()) !== -1);
+
+      return render(contacts_, avatars);
+    });
 
   return {
     DOM: vtree$,
-    HTTP: request$,
+    HTTP: requests$,
   };
 };
 

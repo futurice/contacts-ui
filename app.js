@@ -5,8 +5,8 @@ var fs = require("fs");
 var request = require("request");
 
 // config
-var configVars = ["DATA_URL", "FUM_BASEURL", "FAVICON"];
-var DATA_URL = process.env.DATA_URL || "";
+var configVars = ["CONTACTS_BASEURL", "FUM_BASEURL", "FAVICON"];
+var CONTACTS_BASEURL = process.env.CONTACTS_BASEURL || "";
 
 // app
 var app = express();
@@ -28,9 +28,14 @@ app.get("/", function (req, res) { res.send(indexjs); });
 app.get("/main.js", function(req, res) { res.send(mainjs); });
 
 // Pipe from real backend
-app.get("/data.json", function (req, res) {
+app.get("/contacts.json", function (req, res) {
   res.setHeader("Cache-Control", "public, max-age=3600");
-  request(DATA_URL).pipe(res);
+  request(CONTACTS_BASEURL + "/").pipe(res);
+});
+
+app.get("/avatars.json", function (req, res) {
+  res.setHeader("Cache-Control", "public, max-age=3600");
+  request(CONTACTS_BASEURL + "/avatars.json").pipe(res);
 });
 
 app.listen(8000);
