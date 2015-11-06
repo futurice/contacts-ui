@@ -1,0 +1,26 @@
+{
+  "name": "contacts-ui",
+  "version": "0.0.0",
+  "private": true,
+  "author": "Oleg Grenrus",
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "@cycle/core": "3.1.x",
+    "@cycle/dom": "5.1.x",
+    "@cycle/http": "6.0.x",
+    "express": "^4.13.3",
+    "hyperscript-helpers": "2.0.x",
+    "request": "^2.65.0",
+    "rx": "^4.0.6"
+  },
+  "devDependencies": {
+    "babel": "5.6.x",
+    "babel-eslint": "^4.1.4",
+    "babelify": "6.1.x",
+    "browserify": "11.0.1",
+    "eslint": "^1.8.0"
+  },
+  "scripts": {
+    "test": "make test"
+  }
+}
