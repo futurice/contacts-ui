@@ -29,6 +29,7 @@ app.get("/main.js", function(req, res) { res.send(mainjs); });
 
 // Pipe from real backend
 app.get("/data.json", function (req, res) {
+  res.setHeader("Cache-Control", "public, max-age=3600");
   request(DATA_URL).pipe(res);
 });
 
