@@ -95,8 +95,15 @@ const tableHeader =
     th("Title"),
   ]);
 
-const renderRow = (avatars) => (contact) =>
-  tr([
+const contactMatches = (contact, needle) =>
+  needle.length < 3 ||
+    contact.name.toLowerCase().indexOf(needle.toLowerCase()) !== -1;
+
+const contactMatchesStyle = (contact, needle) =>
+  ({ display: contactMatches(contact, needle) ? "table-row" : "none" });
+
+const renderRow = (avatars, needle) => (contact) =>
+  tr({ style: contactMatchesStyle(contact, needle) }, [
     td(dataImg(avatars, contact.thumb)),
     td(a({ href: FUM_BASEURL + "/fum/users/" + contact.login }, contact.name)),
     td(separatedBy(contact.phones.map(renderPhone), " ")),
@@ -108,14 +115,14 @@ const renderRow = (avatars) => (contact) =>
     td(contact.title),
   ]);
 
-const render = (contacts, avatars) =>
+const render = (contacts, avatars, needle) =>
   div([
     issueReports,
     filterBar,
     table([
       thead(tableHeader),
       tbody(
-        contacts.map(renderRow(avatars)),
+        contacts.map(renderRow(avatars, needle)),
       ),
     ]),
   ]);
@@ -128,7 +135,9 @@ const main = (responses) => {
   const filter$ = responses.DOM
     .select(".filter").events("input")
     .map(ev => ev.target.value)
-    .startWith("");
+    .startWith("")
+    .map(needle => needle.trim().length < 3 ? "" : needle.trim())
+    .distinctUntilChanged();
 
   const contacts$ = responses.HTTP
     .filter(res$ => res$.request.indexOf(CONTACTS_URL) === 0)
@@ -142,13 +151,8 @@ const main = (responses) => {
     .map(res => res.body)
     .startWith({});
 
-  const vtree$ = Rx.Observable.combineLatest(contacts$, avatars$, filter$,
-    (contacts, avatars, needle) => {
-      const contacts_ = needle.length < 3 ? contacts : contacts.filter(contact =>
-          contact.name.toLowerCase().indexOf(needle.toLowerCase()) !== -1);
-
-      return render(contacts_, avatars);
-    });
+  const vtree$ =
+    Rx.Observable.combineLatest(contacts$, avatars$, filter$, render);
 
   return {
     DOM: vtree$,
