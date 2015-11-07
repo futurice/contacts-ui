@@ -109,9 +109,17 @@ const tableHeader =
     th("Title"),
   ]);
 
+const strContains = (str, needle) =>
+  str.toLowerCase().indexOf(needle.toLowerCase()) !== -1;
+
+const triMatches = (tri, f) =>
+  (tri.tag === "sure" || tri.tag === "unsure") && f(tri.contents);
+
 const contactMatches = (contact, needle) =>
   needle.length < 3 ||
-    contact.name.toLowerCase().indexOf(needle.toLowerCase()) !== -1;
+    strContains(contact.name, needle) ||
+    triMatches(contact.flowdock, fd => strContains(fd.nick, needle)) ||
+    triMatches(contact.github, gh => strContains(gh.nick, needle));
 
 const contactMatchesStyle = (contact, needle) =>
   ({ display: contactMatches(contact, needle) ? "table-row" : "none" });
