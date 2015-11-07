@@ -2,7 +2,7 @@
 import Cycle from "@cycle/core";
 import { h, makeDOMDriver } from "@cycle/dom";
 import { makeHTTPDriver } from "@cycle/http";
-const { div, span, a, table, thead, tbody, tr, th, td, img } =
+const { div, span, a, table, thead, tbody, tr, th, td, img, sup } =
   require("hyperscript-helpers")(h);
 const Rx = Cycle.Rx;
 
@@ -48,12 +48,26 @@ const tri = (d, f) => {
   }
 };
 
+const triDagger = (d, f) => {
+  switch (d.tag) {
+  case "unsure":
+    return span(".unsure", [
+      f(d.contents),
+      a({ href: "#dagger" }, sup("†")),
+    ]);
+  case "sure":
+    return f(d.contents);
+  default: // case "unknown":
+    return span("");
+  }
+};
+
 const flowdockAvatar = (avatars, t) => tri(t, (fd) =>
   a({ href: "https://www.flowdock.com/app/private/" + fd.id }, [
     dataImg(avatars, fd.avatar),
   ]));
 
-const flowdock = (t) => tri(t, (fd) =>
+const flowdock = (t) => triDagger(t, (fd) =>
   a({ href: "https://www.flowdock.com/app/private/" + fd.id }, [
     fd.nick,
   ]));
@@ -63,7 +77,7 @@ const githubAvatar = (avatars, t) => tri(t, (gh) =>
     dataImg(avatars, gh.avatar),
   ]));
 
-const github = (t) => tri(t, (gh) =>
+const github = (t) => triDagger(t, (gh) =>
   a({ href: "https://github.com/" + gh.nick }, [
     gh.nick,
   ]));
@@ -115,6 +129,18 @@ const renderRow = (avatars, needle) => (contact) =>
     td(contact.title),
   ]);
 
+const footer =
+  div("#footer", [
+    a({ name: "dagger" }),
+    sup("†"),
+    " Entries in ",
+    span(".unsure", "red"),
+    " are unsure. The information is not from FUM or seems to be wrong.",
+    h("br"),
+    sup("‡"),
+    " Data is updated about once an hour."
+  ]);
+
 const render = (contacts, avatars, needle) =>
   div([
     issueReports,
@@ -125,6 +151,7 @@ const render = (contacts, avatars, needle) =>
         contacts.map(renderRow(avatars, needle)),
       ),
     ]),
+    footer,
   ]);
 
 const main = (responses) => {
