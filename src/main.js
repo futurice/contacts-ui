@@ -112,8 +112,8 @@ const tableHeader =
 const strContains = (str, needle) =>
   str.toLowerCase().indexOf(needle.toLowerCase()) !== -1;
 
-const triMatches = (tri, f) =>
-  (tri.tag === "sure" || tri.tag === "unsure") && f(tri.contents);
+const triMatches = (t, f) =>
+  (t.tag === "sure" || t.tag === "unsure") && f(t.contents);
 
 const contactMatches = (contact, needle) =>
   needle.length < 3 ||
@@ -146,19 +146,27 @@ const footer =
     " are unsure. The information is not from FUM or seems to be wrong.",
     h("br"),
     sup("‡"),
-    " Data is updated about once an hour."
+    " Data is updated about once an hour.",
   ]);
+
+const renderTable = (contacts, avatars, needle) =>
+  table([
+    thead(tableHeader),
+    tbody(
+      contacts.map(renderRow(avatars, needle)),
+    ),
+  ]);
+
+const renderSpinner =
+  div(".loader", "Loading...");
 
 const render = (contacts, avatars, needle) =>
   div([
     issueReports,
     filterBar,
-    table([
-      thead(tableHeader),
-      tbody(
-        contacts.map(renderRow(avatars, needle)),
-      ),
-    ]),
+    contacts.length === 0 ?
+      renderSpinner :
+      renderTable(contacts, avatars, needle),
     footer,
   ]);
 

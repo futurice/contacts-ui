@@ -23,11 +23,13 @@ function readFile(fileName) {
 // expand templates
 var indexjs = readFile("index.html");
 var mainjs = readFile("dist/main.js");
+var stylecss = readFile("style.css");
 
-app.get("/", function (req, res) { res.send(indexjs); });
-app.get("/main.js", function(req, res) { res.send(mainjs); });
+app.get("/", function (req, res) { res.set("Content-Type", "text/html"); res.send(indexjs); });
+app.get("/main.js", function(req, res) { res.set("Content-Type", "text/javascript"); res.send(mainjs); });
+app.get("/style.css", function(req, res) { res.set("Content-Type", "text/css"); res.send(stylecss); });
 
-// Pipe from real backend
+// Pipe from the real backend
 app.get("/contacts.json", function (req, res) {
   res.setHeader("Cache-Control", "public, max-age=3600");
   request(CONTACTS_BASEURL + "/").pipe(res);
