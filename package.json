@@ -11,7 +11,7 @@
     "express": "^4.13.3",
     "hyperscript-helpers": "2.0.x",
     "request": "^2.65.0",
-    "rx": "^4.0.6"
+    "rx": "^4.0.7"
   },
   "devDependencies": {
     "babel": "5.6.x",

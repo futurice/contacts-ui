@@ -35,4 +35,5 @@ app.get("/contacts.json", function (req, res) {
   request(CONTACTS_BASEURL + "/").pipe(res);
 });
 
+console.log("Hello, contacts-ui is alive");
 app.listen(8000);

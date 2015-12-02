@@ -124,7 +124,7 @@ const contactMatchesStyle = (contact, needle) =>
 
 const renderRow = (avatars, needle) => (contact) =>
   tr({ style: contactMatchesStyle(contact, needle) }, [
-    td(dataImg(avatars, contact.thumb)),
+    td(a({ href: FUM_BASEURL + "/fum/users/" + contact.login }, dataImg(avatars, contact.thumb))),
     td(a({ href: FUM_BASEURL + "/fum/users/" + contact.login }, contact.name)),
     td(separatedBy(contact.phones.map(renderPhone), " ")),
     td(flowdockAvatar(avatars, contact.flowdock)),
@@ -158,7 +158,7 @@ const renderTable = (contacts, avatars, needle) =>
 const renderSpinner =
   div(".loader", "Loading...");
 
-const render = (contacts, avatars, needle) =>
+const contactsRender = (contacts, avatars, needle) =>
   div([
     issueReports,
     filterBar,
@@ -167,6 +167,25 @@ const render = (contacts, avatars, needle) =>
       renderTable(contacts, avatars, needle),
     footer,
   ]);
+
+const mosaicImage = (contact) =>
+  a({ href: FUM_BASEURL + "/fum/users/" + contact.login }, [
+    img({
+      title: contact.name,
+      width: 50,
+      height: 50,
+      src: AVATAR_BASEURL + "/avatar?size=50&grey&url=" + contact.thumb,
+    })
+  ])
+
+const iddqdRender = (contacts) =>
+  div("#mosaic",
+    contacts
+      .filter(contact => !contact.thumb.match(/default_portrait/))
+      .map(mosaicImage));
+
+const render = (contacts, avatars, needle, iddqd) =>
+  iddqd ? iddqdRender(contacts) : contactsRender(contacts, avatars, needle);
 
 const main = (responses) => {
   const requests$ = Rx.Observable.merge(
@@ -179,6 +198,13 @@ const main = (responses) => {
     .map(needle => needle.trim().length < 3 ? "" : needle.trim())
     .distinctUntilChanged();
 
+  const iddqd$ = responses.keyPresses
+    .map(ev => String.fromCharCode(ev.which))
+    .scan((acc, k) => (acc + k).substr(-5))
+    .skipWhile(str => str !== "iddqd")
+    .map(() => true)
+    .startWith(false);
+
   const contacts$ = responses.HTTP
     .filter(res$ => res$.request.indexOf(CONTACTS_URL) === 0)
     .switch()
@@ -188,7 +214,7 @@ const main = (responses) => {
   const avatars$ = Rx.Observable.just(null);
 
   const vtree$ =
-    Rx.Observable.combineLatest(contacts$, avatars$, filter$, render);
+    Rx.Observable.combineLatest(contacts$, avatars$, filter$, iddqd$, render);
 
   return {
     DOM: vtree$,
@@ -199,4 +225,5 @@ const main = (responses) => {
 Cycle.run(main, {
   DOM: makeDOMDriver("#main-container"),
   HTTP: makeHTTPDriver(),
+  keyPresses: () => Rx.Observable.fromEvent(document, "keypress"),
 });
