@@ -5,7 +5,7 @@ var fs = require("fs");
 var request = require("request");
 
 // config
-var configVars = ["CONTACTS_BASEURL", "FUM_BASEURL", "FAVICON"];
+var configVars = ["CONTACTS_BASEURL", "FUM_BASEURL", "AVATAR_BASEURL", "FAVICON"];
 var CONTACTS_BASEURL = process.env.CONTACTS_BASEURL || "";
 
 // app
@@ -33,11 +33,6 @@ app.get("/style.css", function(req, res) { res.set("Content-Type", "text/css"); 
 app.get("/contacts.json", function (req, res) {
   res.setHeader("Cache-Control", "public, max-age=3600");
   request(CONTACTS_BASEURL + "/").pipe(res);
-});
-
-app.get("/avatars.json", function (req, res) {
-  res.setHeader("Cache-Control", "public, max-age=3600");
-  request(CONTACTS_BASEURL + "/avatars.json").pipe(res);
 });
 
 app.listen(8000);

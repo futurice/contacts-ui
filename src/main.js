@@ -7,8 +7,8 @@ const { div, span, a, table, thead, tbody, tr, th, td, img, sup } =
 const Rx = Cycle.Rx;
 
 const FUM_BASEURL = "%%%FUM_BASEURL%%%";
+const AVATAR_BASEURL = "%%%AVATAR_BASEURL%%%";
 const CONTACTS_URL = "/contacts.json";
-const AVATARS_URL = "/avatars.json";
 
 const renderPhone = (phone) => {
   return a({ href: "tel:" + phone }, phone);
@@ -27,14 +27,12 @@ const separatedBy = (arr, sep) => {
   }
 };
 
-const dataImg = (avatars, d) => {
-  const contents = avatars[d];
-
-  if (contents) {
-    return img({ src: "data:image/png;base64," + contents });
-  } else {
-    return span("");
-  }
+const dataImg = (avatars, url) => {
+  return img({
+    src: AVATAR_BASEURL + "/avatar?url=" + encodeURIComponent(url),
+    width: 32,
+    height: 32,
+  });
 };
 
 const tri = (d, f) => {
@@ -172,8 +170,7 @@ const render = (contacts, avatars, needle) =>
 
 const main = (responses) => {
   const requests$ = Rx.Observable.merge(
-    Rx.Observable.just(CONTACTS_URL),
-    Rx.Observable.just(AVATARS_URL));
+    Rx.Observable.just(CONTACTS_URL));
 
   const filter$ = responses.DOM
     .select(".filter").events("input")
@@ -188,11 +185,7 @@ const main = (responses) => {
     .map(res => res.body)
     .startWith([]);
 
-  const avatars$ = responses.HTTP
-    .filter(res$ => res$.request.indexOf(AVATARS_URL) === 0)
-    .switch()
-    .map(res => res.body)
-    .startWith({});
+  const avatars$ = Rx.Observable.just(null);
 
   const vtree$ =
     Rx.Observable.combineLatest(contacts$, avatars$, filter$, render);
