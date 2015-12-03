@@ -20,6 +20,10 @@ th, tr:nth-child(even) { background-color: rgb(238, 243, 245); }
   float: left;
 }
 
+.statstable {
+  margin-top: 2em;
+}
+
 /** from https://github.com/lukehaas/css-loaders */
 /*
 The MIT License (MIT)

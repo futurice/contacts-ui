@@ -1,4 +1,5 @@
 /* global require: true */
+import _ from "lodash";
 import Cycle from "@cycle/core";
 import { h, makeDOMDriver } from "@cycle/dom";
 import { makeHTTPDriver } from "@cycle/http";
@@ -122,17 +123,24 @@ const contactMatches = (contact, needle) =>
 const contactMatchesStyle = (contact, needle) =>
   ({ display: contactMatches(contact, needle) ? "table-row" : "none" });
 
-const renderRow = (avatars, needle) => (contact) =>
+const lastWord = (str) => {
+  if (!str) { return ""; }
+
+  const words = str.split(" ");
+  return words.length === 0 ? "" : words[words.length - 1];
+};
+
+const renderRow = (avatars, needle, firstNameOnly) => (contact) =>
   tr({ style: contactMatchesStyle(contact, needle) }, [
     td(a({ href: FUM_BASEURL + "/fum/users/" + contact.login }, dataImg(avatars, contact.thumb))),
-    td(a({ href: FUM_BASEURL + "/fum/users/" + contact.login }, contact.name)),
+    td(a({ href: FUM_BASEURL + "/fum/users/" + contact.login }, contact[firstNameOnly ? "first" : "name"])),
     td(separatedBy(contact.phones.map(renderPhone), " ")),
     td(flowdockAvatar(avatars, contact.flowdock)),
     td(flowdock(contact.flowdock)),
     td(githubAvatar(avatars, contact.github)),
     td(github(contact.github)),
     td(a({ href: "mailto:" + contact.email }, "email")),
-    td(contact.title),
+    td(firstNameOnly ? lastWord(contact.title) : contact.title),
   ]);
 
 const footer =
@@ -147,24 +155,63 @@ const footer =
     " Data is updated about once an hour.",
   ]);
 
-const renderTable = (contacts, avatars, needle) =>
+const calculateStats = (contacts) => {
+  const names = {};
+  const titles = {};
+  contacts.forEach((contact) => {
+    const name = contact.first;
+    const title = lastWord(contact.title).toLowerCase();
+
+    names[name] = (names[name] || 0) + 1;
+    titles[title] = (titles[title] || 0) + 1;
+  });
+
+  return {
+    names: names,
+    titles: titles,
+  };
+};
+
+const renderStatsTable = (stats) => {
+  const pairs = _.chain(stats)
+    .map((v, k) => [k, v])
+    .filter(([k, v]) => v > 1 && k !== "")
+    .sortBy((x) => -x[1]) // ([_k, v]) => -v
+    .value();
+
+  return table(".statstable", [
+    pairs.map(([k, v]) => tr([
+      td(k),
+      td("" + v),
+    ])),
+  ]);
+};
+
+const renderStatsTables = (stats) =>
+  div([
+    renderStatsTable(stats.names),
+    renderStatsTable(stats.titles),
+  ]);
+
+const renderTable = (contacts, avatars, needle, firstNameOnly) =>
   table([
     thead(tableHeader),
     tbody(
-      contacts.map(renderRow(avatars, needle)),
+      contacts.map(renderRow(avatars, needle, firstNameOnly)),
     ),
   ]);
 
 const renderSpinner =
   div(".loader", "Loading...");
 
-const contactsRender = (contacts, avatars, needle) =>
+const contactsRender = (contacts, avatars, needle, firstNameOnly) =>
   div([
     issueReports,
     filterBar,
     contacts.length === 0 ?
       renderSpinner :
-      renderTable(contacts, avatars, needle),
+      renderTable(contacts, avatars, needle, firstNameOnly),
+    firstNameOnly ? renderStatsTables(calculateStats(contacts)) : null,
     footer,
   ]);
 
@@ -175,8 +222,8 @@ const mosaicImage = (contact) =>
       width: 50,
       height: 50,
       src: AVATAR_BASEURL + "/avatar?size=50&grey&url=" + contact.thumb,
-    })
-  ])
+    }),
+  ]);
 
 const iddqdRender = (contacts) =>
   div("#mosaic",
@@ -184,8 +231,16 @@ const iddqdRender = (contacts) =>
       .filter(contact => !contact.thumb.match(/default_portrait/))
       .map(mosaicImage));
 
-const render = (contacts, avatars, needle, iddqd) =>
-  iddqd ? iddqdRender(contacts) : contactsRender(contacts, avatars, needle);
+const render = (contacts, avatars, needle, iddqd, firstNameOnly) =>
+  iddqd ? iddqdRender(contacts) : contactsRender(contacts, avatars, needle, firstNameOnly);
+
+const codeSource = (keyPresses, code) => keyPresses
+  .map(ev => String.fromCharCode(ev.which))
+  .bufferWithCount(code.length, 1)
+  .map((arr) => arr.join(""))
+  .skipWhile(str => str !== code)
+  .map(() => true)
+  .startWith(false);
 
 const main = (responses) => {
   const requests$ = Rx.Observable.merge(
@@ -198,12 +253,8 @@ const main = (responses) => {
     .map(needle => needle.trim().length < 3 ? "" : needle.trim())
     .distinctUntilChanged();
 
-  const iddqd$ = responses.keyPresses
-    .map(ev => String.fromCharCode(ev.which))
-    .scan((acc, k) => (acc + k).substr(-5))
-    .skipWhile(str => str !== "iddqd")
-    .map(() => true)
-    .startWith(false);
+  const iddqd$ = codeSource(responses.keyPresses, "iddqd");
+  const idclip$ = codeSource(responses.keyPresses, "idclip");
 
   const contacts$ = responses.HTTP
     .filter(res$ => res$.request.indexOf(CONTACTS_URL) === 0)
@@ -214,7 +265,7 @@ const main = (responses) => {
   const avatars$ = Rx.Observable.just(null);
 
   const vtree$ =
-    Rx.Observable.combineLatest(contacts$, avatars$, filter$, iddqd$, render);
+    Rx.Observable.combineLatest(contacts$, avatars$, filter$, iddqd$, idclip$, render);
 
   return {
     DOM: vtree$,
