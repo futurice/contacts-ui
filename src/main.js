@@ -7,9 +7,26 @@ const { div, span, a, table, thead, tbody, tr, th, td, img, sup } =
   require("hyperscript-helpers")(h);
 const Rx = Cycle.Rx;
 
-const FUM_BASEURL = "%%%FUM_BASEURL%%%";
-const AVATAR_BASEURL = "%%%AVATAR_BASEURL%%%";
-const CONTACTS_URL = "/contacts.json";
+const CONFIG_URL = "/config.json";
+const CONTACTS_URL = "/api/contacts.json";
+
+// Haskell-y helper
+const traceShowId = (x) => {
+  console.log(x);
+  return x;
+};
+
+// foundation helpers
+const row = (elems) =>
+  div(".row", elems);
+
+const cell = (width, elems) =>
+  div(".columns.large-" + width, elems);
+
+const wholerow = (elems) =>
+  row(cell(12, elems));
+
+// rest
 
 const renderPhone = (phone) => {
   return a({ href: "tel:" + phone }, phone);
@@ -28,9 +45,9 @@ const separatedBy = (arr, sep) => {
   }
 };
 
-const dataImg = (avatars, url) => {
+const dataImg = (config, avatars, url) => {
   return img({
-    src: AVATAR_BASEURL + "/avatar?url=" + encodeURIComponent(url),
+    src: config.AVATAR_BASEURL + "/avatar?url=" + encodeURIComponent(url),
     width: 32,
     height: 32,
   });
@@ -61,9 +78,9 @@ const triDagger = (d, f) => {
   }
 };
 
-const flowdockAvatar = (avatars, t) => tri(t, (fd) =>
+const flowdockAvatar = (config, avatars, t) => tri(t, (fd) =>
   a({ href: "https://www.flowdock.com/app/private/" + fd.id }, [
-    dataImg(avatars, fd.avatar),
+    dataImg(config, avatars, fd.avatar),
   ]));
 
 const flowdock = (t) => triDagger(t, (fd) =>
@@ -71,9 +88,9 @@ const flowdock = (t) => triDagger(t, (fd) =>
     fd.nick,
   ]));
 
-const githubAvatar = (avatars, t) => tri(t, (gh) =>
+const githubAvatar = (config, avatars, t) => tri(t, (gh) =>
   a({ href: "https://github.com/" + gh.nick }, [
-    dataImg(avatars, gh.avatar),
+    dataImg(config, avatars, gh.avatar),
   ]));
 
 const github = (t) => triDagger(t, (gh) =>
@@ -130,14 +147,14 @@ const lastWord = (str) => {
   return words.length === 0 ? "" : words[words.length - 1];
 };
 
-const renderRow = (avatars, needle, firstNameOnly) => (contact) =>
+const renderRow = (config, avatars, needle, firstNameOnly) => (contact) =>
   tr({ style: contactMatchesStyle(contact, needle) }, [
-    td(a({ href: FUM_BASEURL + "/fum/users/" + contact.login }, dataImg(avatars, contact.thumb))),
-    td(a({ href: FUM_BASEURL + "/fum/users/" + contact.login }, contact[firstNameOnly ? "first" : "name"])),
+    td(a({ href: config.FUM_BASEURL + "/fum/users/" + contact.login }, dataImg(config, avatars, contact.thumb))),
+    td(a({ href: config.FUM_BASEURL + "/fum/users/" + contact.login }, contact[firstNameOnly ? "first" : "name"])),
     td(separatedBy(contact.phones.map(renderPhone), " ")),
-    td(flowdockAvatar(avatars, contact.flowdock)),
+    td(flowdockAvatar(traceShowId(config), avatars, contact.flowdock)),
     td(flowdock(contact.flowdock)),
-    td(githubAvatar(avatars, contact.github)),
+    td(githubAvatar(config, avatars, contact.github)),
     td(github(contact.github)),
     td(a({ href: "mailto:" + contact.email }, "email")),
     td(firstNameOnly ? lastWord(contact.title) : contact.title),
@@ -193,46 +210,46 @@ const renderStatsTables = (stats) =>
     renderStatsTable(stats.titles),
   ]);
 
-const renderTable = (contacts, avatars, needle, firstNameOnly) =>
+const renderTable = (config, contacts, avatars, needle, firstNameOnly) =>
   table([
     thead(tableHeader),
     tbody(
-      contacts.map(renderRow(avatars, needle, firstNameOnly)),
+      traceShowId(contacts).map(renderRow(config, avatars, needle, firstNameOnly)),
     ),
   ]);
 
 const renderSpinner =
   div(".loader", "Loading...");
 
-const contactsRender = (contacts, avatars, needle, firstNameOnly) =>
+const contactsRender = (config, contacts, avatars, needle, firstNameOnly) =>
   div([
-    issueReports,
-    filterBar,
-    contacts.length === 0 ?
+    wholerow(issueReports),
+    row(cell(6, filterBar)),
+    wholerow(contacts.length === 0 ?
       renderSpinner :
-      renderTable(contacts, avatars, needle, firstNameOnly),
-    firstNameOnly ? renderStatsTables(calculateStats(contacts)) : null,
-    footer,
+      renderTable(config, contacts, avatars, needle, firstNameOnly)),
+    firstNameOnly ? wholerow(renderStatsTables(calculateStats(contacts))) : null,
+    wholerow(footer),
   ]);
 
-const mosaicImage = (contact) =>
-  a({ href: FUM_BASEURL + "/fum/users/" + contact.login }, [
+const mosaicImage = (config, contact) =>
+  a({ href: config.FUM_BASEURL + "/fum/users/" + contact.login }, [
     img({
       title: contact.name,
       width: 50,
       height: 50,
-      src: AVATAR_BASEURL + "/avatar?size=50&grey&url=" + contact.thumb,
+      src: config.AVATAR_BASEURL + "/avatar?size=50&grey&url=" + contact.thumb,
     }),
   ]);
 
-const iddqdRender = (contacts) =>
+const iddqdRender = (config, contacts) =>
   div("#mosaic",
     contacts
       .filter(contact => !contact.thumb.match(/default_portrait/))
-      .map(mosaicImage));
+      .map((x) => mosaicImage(config, x)));
 
-const render = (contacts, avatars, needle, iddqd, firstNameOnly) =>
-  iddqd ? iddqdRender(contacts) : contactsRender(contacts, avatars, needle, firstNameOnly);
+const render = (config, contacts, avatars, needle, iddqd, firstNameOnly) =>
+  iddqd ? iddqdRender(config, contacts) : contactsRender(config, contacts, avatars, needle, firstNameOnly);
 
 const codeSource = (keyPresses, code) => keyPresses
   .map(ev => String.fromCharCode(ev.which))
@@ -244,7 +261,13 @@ const codeSource = (keyPresses, code) => keyPresses
 
 const main = (responses) => {
   const requests$ = Rx.Observable.merge(
+    Rx.Observable.just(CONFIG_URL),
     Rx.Observable.just(CONTACTS_URL));
+
+  const config$ = responses.HTTP
+    .filter(res$ => res$.request.indexOf(CONFIG_URL) === 0)
+    .switch()
+    .map(res => res.body);
 
   const filter$ = responses.DOM
     .select(".filter").events("input")
@@ -265,7 +288,7 @@ const main = (responses) => {
   const avatars$ = Rx.Observable.just(null);
 
   const vtree$ =
-    Rx.Observable.combineLatest(contacts$, avatars$, filter$, iddqd$, idclip$, render);
+    Rx.Observable.combineLatest(config$, contacts$, avatars$, filter$, iddqd$, idclip$, render);
 
   return {
     DOM: vtree$,
