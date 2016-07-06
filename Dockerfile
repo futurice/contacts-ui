@@ -1,26 +1,14 @@
-FROM futurice/base-images:nodejs
+FROM nginx:1.11.1
 MAINTAINER Oleg Grenrus <oleg.grenrus@iki.fi>
 
-# Create user
-RUN useradd -m -s /bin/bash -d /app app
+RUN apt-get -yq update && apt-get -yq --no-install-suggests --no-install-recommends --force-yes install \
+    ca-certificates \
+    python \
+   && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
-WORKDIR /app
-ADD package.json /app/package.json
+COPY nginx-contacts-ui-prod.conf /etc/nginx/nginx.conf.tmpl
+COPY start.py /root/start.py
+COPY dist /usr/share/nginx/html
 
-# Build dependencies
-RUN npm install
-
-# Add rest and build the app
-ADD . /app
-RUN make clean && make
-
-# Finalise
-RUN chown -R app:app /app
-
-EXPOSE 8000
-
-# Default startup command
-USER app
-WORKDIR /app
-CMD ["node", "app.js"]
+WORKDIR /root
+CMD ["python", "/root/start.py"]
