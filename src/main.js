@@ -214,7 +214,7 @@ const renderTable = (config, contacts, avatars, needle, firstNameOnly) =>
   table([
     thead(tableHeader),
     tbody(
-      traceShowId(contacts).map(renderRow(config, avatars, needle, firstNameOnly)),
+      traceShowId(contacts).map(renderRow(config, avatars, needle, firstNameOnly))
     ),
   ]);
 

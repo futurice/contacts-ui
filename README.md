@@ -1,5 +1,7 @@
 # contacts-ui
 
+Requires `node >= 4`
+
 ## Building
 
 ```
