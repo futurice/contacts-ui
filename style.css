@@ -1,16 +1,11 @@
-input { max-width: 50%; width: 300px; }
-table { border-collapse: collapse; min-width: 100%; }
-th, td, a, span, body, input, label { font-size: 16px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
-#searchbar { padding-top: 5px; padding-bottom: 5px; }
-#footer { margin-top: 0.5em; font-size: 13px; }
-#footer span { font-size: 13px; }
-th, td { color: rgb(33, 15, 0); padding: 2px 0.5em; }
-a { color: rgb(38, 104, 38); text-decoration: none; }
-a:hover { color: rgb(65, 175, 70); }
-th { text-align: left; }
+h1, h2, h3, h4, li, td, div, span, b { font-family: "Lucida Grande", Helvetica, Arial, sans-serif; }
+* { font-size: 11pt; }
+h1 { font-size: 20pt; font-weight: bold; }
+h2 { font-size: 15pt; font-weight: bold; }
+h3 { font-size: 13pt; font-weight: bold; }
+
 .unsure, .unsure a { color: rgb(255, 82, 64); }
 .unsure a:hover { color: rgb(255, 130, 30); }
-th, tr:nth-child(even) { background-color: rgb(238, 243, 245); }
 
 #mosaic img {
   -webkit-transform:rotate(5deg);
@@ -18,10 +13,6 @@ th, tr:nth-child(even) { background-color: rgb(238, 243, 245); }
   border: 1px solid #aaa;
   box-shadow: 5px 5px 10px #888;
   float: left;
-}
-
-.statstable {
-  margin-top: 2em;
 }
 
 /** from https://github.com/lukehaas/css-loaders */
