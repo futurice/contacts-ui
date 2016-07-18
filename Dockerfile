@@ -10,5 +10,7 @@ COPY nginx-contacts-ui-prod.conf /etc/nginx/nginx.conf.tmpl
 COPY start.py /root/start.py
 COPY dist /usr/share/nginx/html
 
+EXPOSE 8000
+
 WORKDIR /root
 CMD ["python", "/root/start.py"]
