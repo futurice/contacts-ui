@@ -23,4 +23,4 @@ with open('/etc/nginx/nginx.conf.tmpl', 'r') as ftmpl:
         f.write(contents)
 
 # start nginx
-os.execlp('nginx', '-g', 'daemon off;')
+os.execlp('nginx', 'nginx', '-g', 'daemon off;')
