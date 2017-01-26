@@ -17,3 +17,4 @@ browserify : dist src/main.js
 
 docker : browserify
 	docker build --rm -t futurice/contacts:`git log --pretty=format:'%h' -n 1` .
+	@echo docker push futurice/contacts:`git log --pretty=format:'%h' -n 1`
