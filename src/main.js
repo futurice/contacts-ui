@@ -220,6 +220,19 @@ const renderTable = (config, contacts, avatars, needle, firstNameOnly) =>
     ),
   ]);
 
+// let's not name tribes "external' ;)
+const countExternals = (contacts) =>
+  _.chain(contacts)
+    .filter((c) => (c.team || "").match(/external/i))
+    .value()
+    .length;
+
+const renderCounts = (contacts) => {
+  const total = contacts.length;
+  const exts = countExternals(contacts);
+  return div("There are " + (total - exts) + " futuriceans and " + exts + " externals.");
+};
+
 const renderSpinner =
   div(".loader", "Loading...");
 
@@ -227,6 +240,7 @@ const contactsRender = (config, contacts, avatars, needle, firstNameOnly) =>
   div([
     wholerow(issueReports),
     row(cell(6, filterBar)),
+    row(cell(12, renderCounts(contacts))),
     wholerow(contacts.length === 0 ?
       renderSpinner :
       renderTable(config, contacts, avatars, needle, firstNameOnly)),
