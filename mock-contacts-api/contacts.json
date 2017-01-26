@@ -49,5 +49,31 @@
         ],
         "thumb": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
         "title": "Futulainen"
+    },
+    {
+        "email": "spam-here@futurice.com",
+        "first": "Futu",
+        "flowdock": {
+            "contents": {
+                "avatar": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
+                "id": 0,
+                "nick": "futu"
+            },
+            "tag": "sure"
+        },
+        "github": [
+            2,
+            [],
+            "unknown"
+        ],
+        "image": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
+        "login": "futu",
+        "name": "Ext worker",
+        "phones": [
+            "+35850xxxxxxx"
+        ],
+        "thumb": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
+        "title": "Futulainen",
+	"team": "900-External"
     }
 ]
