@@ -10,11 +10,13 @@ const Rx = Cycle.Rx;
 const CONFIG_URL = "/config.json";
 const CONTACTS_URL = "/api/contacts.json";
 
+/*
 // Haskell-y helper
 const traceShowId = (x) => {
   console.log(x);
   return x;
 };
+*/
 
 // foundation helpers
 const row = (elems) =>
@@ -154,7 +156,7 @@ const renderRow = (config, avatars, needle, firstNameOnly) => (contact) =>
     td(a({ href: config.FUM_BASEURL + "/fum/users/" + contact.login }, contact[firstNameOnly ? "first" : "name"])),
     td(separatedBy(contact.phones.map(renderPhone), " ")),
     td((contact.team || "").replace(/^\d+-/, "")),
-    td(flowdockAvatar(traceShowId(config), avatars, contact.flowdock)),
+    td(flowdockAvatar(config, avatars, contact.flowdock)),
     td(flowdock(contact.flowdock)),
     td(githubAvatar(config, avatars, contact.github)),
     td(github(contact.github)),
@@ -216,7 +218,7 @@ const renderTable = (config, contacts, avatars, needle, firstNameOnly) =>
   table([
     thead(tableHeader),
     tbody(
-      traceShowId(contacts).map(renderRow(config, avatars, needle, firstNameOnly))
+      contacts.map(renderRow(config, avatars, needle, firstNameOnly))
     ),
   ]);
 
