@@ -23,7 +23,8 @@
         ],
         "thumb": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
         "title": "Futulainen",
-        "team": "101-Leijonat"
+        "team": "101-Leijonat",
+        "competence": "Developer"
     },
     {
         "email": "spam-here@futurice.com",
@@ -43,12 +44,13 @@
         ],
         "image": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
         "login": "futu",
-        "name": "Futu Laine",
+        "name": "Futu Hämäläinen",
         "phones": [
             "+35850xxxxxxx"
         ],
         "thumb": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
-        "title": "Futulainen"
+        "title": "Futulainen",
+        "competence": "Developer"
     },
     {
         "email": "spam-here@futurice.com",
@@ -74,6 +76,7 @@
         ],
         "thumb": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
         "title": "Futulainen",
-	"team": "900-External"
+        "team": "900-External",
+        "competence": "External"
     }
 ]

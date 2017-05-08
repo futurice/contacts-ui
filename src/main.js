@@ -128,8 +128,14 @@ const tableHeader =
     th("Title"),
   ]);
 
+const normalizeNFD = (str) =>
+    typeof str.normalize === "function" ? str.normalize("NFD") : str;
+
+const canonicalize = (str) =>
+    normalizeNFD(str.replace("ø", "o")).toLowerCase();
+
 const strContains = (str, needle) =>
-  str.toLowerCase().indexOf(needle.toLowerCase()) !== -1;
+  canonicalize(str).indexOf(canonicalize(needle)) !== -1;
 
 const triMatches = (t, f) =>
   (t.tag === "sure" || t.tag === "unsure") && f(t.contents);
