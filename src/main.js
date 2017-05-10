@@ -172,7 +172,7 @@ const renderRow = (config, avatars, needle, firstNameOnly) => (contact) =>
     td(github(contact.github)),
     td(a({ href: "mailto:" + contact.email }, "email")),
     td(firstNameOnly ? lastWord(contact.title) : contact.title),
-    prettyCompetence(contact.competence),
+    td(prettyCompetence(contact.competence)),
   ]);
 
 const footer =
