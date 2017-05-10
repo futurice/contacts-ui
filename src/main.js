@@ -158,7 +158,7 @@ const lastWord = (str) => {
 };
 
 const prettyCompetence = (str) =>
-    str.replace(" (Primary", "");
+    (str || "").replace(" (Primary", "");
 
 const renderRow = (config, avatars, needle, firstNameOnly) => (contact) =>
   tr({ style: contactMatchesStyle(contact, needle) }, [
