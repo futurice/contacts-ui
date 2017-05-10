@@ -126,6 +126,7 @@ const tableHeader =
     th("GitHub"),
     th("Mail"),
     th("Title"),
+    th("Competence"),
   ]);
 
 const normalizeNFD = (str) =>
@@ -156,6 +157,9 @@ const lastWord = (str) => {
   return words.length === 0 ? "" : words[words.length - 1];
 };
 
+const prettyCompetence = (str) =>
+    str.replace(" (Primary", "");
+
 const renderRow = (config, avatars, needle, firstNameOnly) => (contact) =>
   tr({ style: contactMatchesStyle(contact, needle) }, [
     td(a({ href: config.FUM_BASEURL + "/fum/users/" + contact.login }, dataImg(config, avatars, contact.thumb))),
@@ -168,6 +172,7 @@ const renderRow = (config, avatars, needle, firstNameOnly) => (contact) =>
     td(github(contact.github)),
     td(a({ href: "mailto:" + contact.email }, "email")),
     td(firstNameOnly ? lastWord(contact.title) : contact.title),
+    prettyCompetence(contact.competence),
   ]);
 
 const footer =
