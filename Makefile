@@ -5,15 +5,18 @@ all : browserify
 clean :
 	rm -rf dist
 
-test : 
-	node_modules/.bin/eslint src/main.js
+test :
+	node_modules/.bin/tslint -p tsconfig.json
 
-dist : 
+dist :
 	mkdir -p dist
 
-browserify : dist src/main.js
+browserify : dist src/main.ts
 	cp index.html style.css foundation.min.css dist/
-	node_modules/.bin/browserify -t [ babelify --presets es2015 ]  src/main.js --outfile dist/main.js
+	node_modules/.bin/browserify -p [ tsify ]  src/main.ts --outfile dist/main.js
+
+format :
+	prettier --write --trailing-comma all --no-semi src/main.ts
 
 docker : browserify
 	docker build --rm -t futurice/contacts:`git log --pretty=format:'%h' -n 1` .
