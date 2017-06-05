@@ -4,6 +4,8 @@ Requires `node >= 4`
 
 ## Building
 
+Install dependencies with `yarn`!
+
 ```
 make
 ```

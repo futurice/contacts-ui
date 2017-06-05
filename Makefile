@@ -1,4 +1,4 @@
-.PHONY : all browserify test clean docker
+.PHONY : all browserify test clean docker david format prettier
 
 all : browserify
 
@@ -23,8 +23,13 @@ browserify : dist src/main.ts
 	cp index.html style.css foundation.min.css dist/
 	node_modules/.bin/browserify -p [ tsify ]  src/main.ts --outfile dist/main.js
 
-format :
-	prettier --write --trailing-comma all --no-semi src/main.ts
+david :
+	node_modules/.bin/david
+
+format : prettier
+
+prettier :
+	node_modules/.bin/prettier --write --trailing-comma all --semi src/main.ts
 
 docker : browserify
 	docker build --rm -t futurice/contacts:`git log --pretty=format:'%h' -n 1` .
