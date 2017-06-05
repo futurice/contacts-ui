@@ -3,6 +3,7 @@ import {
   br,
   div,
   DOMSource,
+  h,
   img,
   input,
   makeDOMDriver,
@@ -49,7 +50,7 @@ const wholerow = (elems: VDOM) => row(cell(12, elems));
 // rest
 
 const renderPhone = (phone: string) => {
-  return a({ href: "tel:" + phone }, phone);
+  return a({ props: { href: "tel:" + phone } }, phone);
 };
 
 function separatedBy<T, S>(arr: T[], sep: S): Array<T | S> {
@@ -66,10 +67,14 @@ function separatedBy<T, S>(arr: T[], sep: S): Array<T | S> {
 }
 
 function dataImg(config: Config, url: string) {
-  return img({
-    height: 32,
-    src: config.AVATAR_BASEURL + "/avatar?url=" + encodeURIComponent(url),
-    width: 32,
+  const srcUrl = config.AVATAR_BASEURL === ""
+    ? url
+    : config.AVATAR_BASEURL + "/avatar?url=" + encodeURIComponent(url);
+  return h("img", {
+    props: {
+      src: srcUrl,
+      width: 32,
+    },
   });
 }
 
@@ -88,7 +93,10 @@ function tri<T>(d: Tri<T>, f: (t: T) => VDOM) {
 function triDagger<T>(d: Tri<T>, f: (t: T) => VDOM) {
   switch (d.tag) {
     case "unsure":
-      return span(".unsure", [f(d.contents), a({ href: "#dagger" }, sup("†"))]);
+      return span(".unsure", [
+        f(d.contents),
+        a({ props: { href: "#dagger" } }, sup("†")),
+      ]);
     case "sure":
       return f(d.contents);
     default:
@@ -110,28 +118,34 @@ interface GithubUser {
 
 const flowdockAvatar = (config: Config, t: Tri<FlowdockUser>) =>
   tri(t, fd =>
-    a({ href: "https://www.flowdock.com/app/private/" + fd.id }, [
+    a({ props: { href: "https://www.flowdock.com/app/private/" + fd.id } }, [
       dataImg(config, fd.avatar),
     ]),
   );
 
 const flowdock = (t: Tri<FlowdockUser>) =>
   triDagger(t, fd =>
-    a({ href: "https://www.flowdock.com/app/private/" + fd.id }, [fd.nick]),
+    a({ props: { href: "https://www.flowdock.com/app/private/" + fd.id } }, [
+      fd.nick,
+    ]),
   );
 
 const githubAvatar = (config: Config, t: Tri<GithubUser>) =>
   tri(t, gh =>
-    a({ href: "https://github.com/" + gh.nick }, [dataImg(config, gh.avatar)]),
+    a({ props: { href: "https://github.com/" + gh.nick } }, [
+      dataImg(config, gh.avatar),
+    ]),
   );
 
 const github = (t: Tri<GithubUser>) =>
-  triDagger(t, gh => a({ href: "https://github.com/" + gh.nick }, [gh.nick]));
+  triDagger(t, gh =>
+    a({ props: { href: "https://github.com/" + gh.nick } }, [gh.nick]),
+  );
 
 const issueReports = span([
   "This service is still in flux, please fill bug reports and features requests at ",
   a(
-    { href: "https://github.com/futurice/contacts-ui" },
+    { props: { href: "https://github.com/futurice/contacts-ui" } },
     "futurice/contacts-ui",
   ),
 ]);
@@ -213,8 +227,9 @@ const renderRow = (config: Config, needle: string, firstNameOnly: boolean) => (
 ) =>
   tr({ style: contactMatchesStyle(contact, needle) }, [
     td(
+      ".img-column",
       a(
-        { href: config.FUM_BASEURL + "/fum/users/" + contact.login },
+        { props: { href: config.FUM_BASEURL + "/fum/users/" + contact.login } },
         dataImg(config, contact.thumb),
       ),
     ),
@@ -226,17 +241,17 @@ const renderRow = (config: Config, needle: string, firstNameOnly: boolean) => (
     ),
     td(separatedBy(contact.phones.map(renderPhone), " ")),
     td((contact.team || "").replace(/^\d+-/, "")),
-    td(flowdockAvatar(config, contact.flowdock)),
+    td(".img-column", flowdockAvatar(config, contact.flowdock)),
     td(flowdock(contact.flowdock)),
-    td(githubAvatar(config, contact.github)),
+    td(".img-column", githubAvatar(config, contact.github)),
     td(github(contact.github)),
-    td(a({ href: "mailto:" + contact.email }, "email")),
+    td(a({ props: { href: "mailto:" + contact.email } }, "email")),
     td(firstNameOnly ? lastWord(contact.title) : contact.title),
     td(prettyCompetence(contact.competence)),
   ]);
 
 const footer = div("#footer", [
-  a({ name: "dagger" }),
+  a({ props: { name: "dagger" } }),
   sup("†"),
   " Entries in ",
   span(".unsure", "red"),
@@ -338,10 +353,13 @@ function renderContacts(
 const mosaicImage = (config: Config, contact: Contact) =>
   a({ href: config.FUM_BASEURL + "/fum/users/" + contact.login }, [
     img({
-      height: 50,
-      src: config.AVATAR_BASEURL + "/avatar?size=50&grey&url=" + contact.thumb,
-      title: contact.name,
-      width: 50,
+      props: {
+        height: 50,
+        src:
+          config.AVATAR_BASEURL + "/avatar?size=50&grey&url=" + contact.thumb,
+        title: contact.name,
+        width: 50,
+      },
     }),
   ]);
 
