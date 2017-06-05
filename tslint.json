@@ -7,7 +7,7 @@
     "rules": {
         "semicolon": [
             true,
-            "never"
+            "always"
         ],
         "variable-name": [
             false
