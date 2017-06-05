@@ -8,6 +8,14 @@ clean :
 test :
 	node_modules/.bin/tslint -p tsconfig.json
 
+# Install yarn in local directory
+local-yarn :
+	mkdir -p .yarn
+	cd .yarn
+	npm install yarn
+	cd ..
+	./.yarn/node_modules/.bin/yarn
+
 dist :
 	mkdir -p dist
 
