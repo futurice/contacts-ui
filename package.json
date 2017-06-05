@@ -17,7 +17,6 @@
     "@types/node": "^7.0.23",
     "browserify": "^13.0.1",
     "david": "^7.0.2",
-    "husky": "^0.13.4",
     "lint-staged": "^3.6.0",
     "prettier": "^1.4.0-beta",
     "tsify": "^3.0.1",
