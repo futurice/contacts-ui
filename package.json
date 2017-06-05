@@ -5,7 +5,6 @@
   "author": "Oleg Grenrus",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "@cycle/core": "3.1.x",
     "@cycle/dom": "^17.4.0",
     "@cycle/http": "^13.3.0",
     "@cycle/run": "^3.1.0",
