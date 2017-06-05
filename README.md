@@ -24,6 +24,11 @@ TODO: write Dockerfile, which on start will write `nginx.conf`
 
 see `src/main.js`
 
+
+## Prettifying
+
+make format
+
 ## Misc
 
 ```
