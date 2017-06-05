@@ -282,7 +282,10 @@ const renderStatsTable = (stats: String2Number) => {
     .sortBy(x => -x[1]) // ([_k, v]) => -v
     .value()
 
-  return table(".statstable", [pairs.map(([k, v]) => tr([td(k), td("" + v)]))])
+  return table(
+    ".statstable",
+    pairs.map(([k, v]) => tr([td(k), td(v.toString())])),
+  )
 }
 
 const renderStatsTables = (stats: Stats) =>
