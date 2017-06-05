@@ -122,9 +122,7 @@ const flowdock = (t: Tri<FlowdockUser>) =>
 
 const githubAvatar = (config: Config, t: Tri<GithubUser>) =>
   tri(t, gh =>
-    a({ href: "https://github.com/" + gh.nick }, [
-      dataImg(config, gh.avatar),
-    ]),
+    a({ href: "https://github.com/" + gh.nick }, [dataImg(config, gh.avatar)]),
   )
 
 const github = (t: Tri<GithubUser>) =>
@@ -210,11 +208,9 @@ const lastWord = (str: string) => {
 
 const prettyCompetence = (str: string) => (str || "").replace(" (Primary)", "")
 
-const renderRow = (
-  config: Config,
-  needle: string,
-  firstNameOnly: boolean,
-) => (contact: Contact) =>
+const renderRow = (config: Config, needle: string, firstNameOnly: boolean) => (
+  contact: Contact,
+) =>
   tr({ style: contactMatchesStyle(contact, needle) }, [
     td(
       a(
@@ -321,7 +317,6 @@ function renderContacts(
   config: Config,
   contacts: Contact[],
   needle: string,
-
   firstNameOnly: boolean,
 ) {
   return div([
@@ -426,7 +421,7 @@ function main(responses: Sources) {
 
   const vtree$ = xs
     .combine(config$, contacts$, filter$, iddqd$, idclip$)
-    .map((args) => render.apply(null, args))
+    .map(args => render.apply(null, args))
 
   return {
     DOM: vtree$,
