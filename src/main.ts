@@ -164,6 +164,7 @@ const tableHeader = tr([
   th("Name"),
   th("Phone"),
   th("Team"),
+  th("Office"),
   th(),
   th("Flowdock"),
   th(),
@@ -193,12 +194,14 @@ interface Contact {
   login: string;
   first: string;
   last: string;
-  team: string | null;
+  team: string;
   phones: string[];
   email: string;
   title: string;
   competence: string;
+  office: string;
   thumb: string;
+  external: boolean;
 }
 
 const contactMatches = (contact: Contact, needle: string) =>
@@ -235,12 +238,13 @@ const renderRow = (config: Config, needle: string, firstNameOnly: boolean) => (
     ),
     td(
       a(
-        { href: config.FUM_BASEURL + "/fum/users/" + contact.login },
+        { props: { href: config.FUM_BASEURL + "/fum/users/" + contact.login } },
         contact[firstNameOnly ? "first" : "name"],
       ),
     ),
     td(separatedBy(contact.phones.map(renderPhone), " ")),
-    td((contact.team || "").replace(/^\d+-/, "")),
+    td(contact.team || ""),
+    td(contact.office || ""),
     td(".img-column", flowdockAvatar(config, contact.flowdock)),
     td(flowdock(contact.flowdock)),
     td(".img-column", githubAvatar(config, contact.github)),
@@ -315,8 +319,7 @@ const renderTable = (
 
 // let's not name tribes "external' ;)
 const countExternals = (contacts: Contact[]) =>
-  _.chain(contacts).filter(c => (c.team || "").match(/external/i)).value()
-    .length;
+  _.chain(contacts).filter(c => c.external).value().length;
 
 const renderCounts = (contacts: Contact[]) => {
   const total = contacts.length;
@@ -418,7 +421,10 @@ function main(responses: Sources) {
   const config$: Stream<Config> = responses.HTTP
     .select("config")
     .flatten()
-    .map(res => res.body);
+    .map(res => {
+      // console.info("Got config", res.body);
+      return res.body;
+    });
 
   const filter$ = responses.DOM
     .select(".filter")
@@ -434,7 +440,10 @@ function main(responses: Sources) {
   const contacts$: Stream<Contact[]> = responses.HTTP
     .select("contacts")
     .flatten()
-    .map(res => res.body)
+    .map(res => {
+      // console.info("Got contacts");
+      return res.body;
+    })
     .startWith([]);
 
   const vtree$ = xs
