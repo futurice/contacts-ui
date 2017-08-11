@@ -10,11 +10,9 @@
             },
             "tag": "sure"
         },
-        "github": [
-            2,
-            [],
-            "unknown"
-        ],
+        "github": {
+            "tag": "unknown"
+        },
         "image": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
         "thumb": "https://avatars3.githubusercontent.com/u/852157?v=3&s=32",
         "login": "futu",
@@ -24,7 +22,8 @@
         ],
         "thumb": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
         "title": "Futulainen",
-        "team": "101-Leijonat",
+        "team": "Leijonat",
+        "office": "Helsinki",
         "competence": "Developer (Primary)"
     },
     {
@@ -38,11 +37,13 @@
             },
             "tag": "sure"
         },
-        "github": [
-            2,
-            [],
-            "unknown"
-        ],
+        "github": {
+            "tag": "unsure",
+            "contents": {
+              "nick": "gh-nick1",
+              "avatar": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200"
+            }
+        },
         "image": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
         "thumb": "https://avatars3.githubusercontent.com/u/852157?v=3&s=32",
         "login": "futu",
@@ -52,7 +53,10 @@
         ],
         "thumb": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
         "title": "Futulainen",
-        "competence": "Developer"
+        "competence": "Developer",
+        "team": "Leijonat",
+        "office": "Helsinki",
+        "external": false
     },
     {
         "email": "spam-here@futurice.com",
@@ -65,11 +69,13 @@
             },
             "tag": "sure"
         },
-        "github": [
-            2,
-            [],
-            "unknown"
-        ],
+        "github": {
+            "tag": "unsure",
+            "contents": {
+              "nick": "gh-nick",
+              "avatar": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200"
+            }
+        },
         "image": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
         "thumb": "https://avatars3.githubusercontent.com/u/852157?v=3&s=32",
         "login": "futu",
@@ -79,7 +85,9 @@
         ],
         "thumb": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
         "title": "Futulainen",
-        "team": "900-External",
-        "competence": "External"
+        "team": "tiimi",
+        "office": "Helsinki",
+        "competence": "Designer",
+        "external": true
     }
 ]

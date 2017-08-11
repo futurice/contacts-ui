@@ -20,7 +20,11 @@ docker-compose up
 
 ## Deploying
 
-TODO: write Dockerfile, which on start will write `nginx.conf`
+```
+make docker
+```
+
+follow the output!
 
 ## Hacking
 
