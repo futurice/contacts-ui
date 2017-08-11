@@ -315,7 +315,7 @@ const renderTable = (
   needle: string,
   firstNameOnly: boolean,
 ) =>
-  table([
+  table(".hover", [
     thead(tableHeader),
     tbody(contacts.map(renderRow(config, needle, firstNameOnly))),
   ]);
