@@ -159,15 +159,18 @@ const filterBar = div("#searchbar", [
   }),
 ]);
 
+const avatarTh = () =>
+  th({ props: { width: 50 } });
+
 const tableHeader = tr([
-  th(),
+  avatarTh(),
   th("Name"),
   th("Phone"),
   th("Team"),
   th("Office"),
-  th(),
+  avatarTh(),
   th("Flowdock"),
-  th(),
+  avatarTh(),
   th("GitHub"),
   th("Mail"),
   th("Title"),
