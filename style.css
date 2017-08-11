@@ -17,7 +17,7 @@ h3 { font-size: 13pt; font-weight: bold; }
 
 /* Makes the column wide enough to fit the image */
 .img-column {
-	width: 32px;
+	width: 52px;
 }
 
 /** from https://github.com/lukehaas/css-loaders */
