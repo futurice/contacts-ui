@@ -32,11 +32,6 @@ interface Config {
 const CONFIG_URL = "/config.json";
 const CONTACTS_URL = "/api/contacts.json";
 
-interface Tri<T> {
-  tag: "sure" | "unsure" | "unknown";
-  contents: T;
-}
-
 type VDOM = VNode | VNode[];
 
 // foundation helpers
@@ -78,30 +73,11 @@ function dataImg(config: Config, url: string) {
   });
 }
 
-function tri<T>(d: Tri<T>, f: (t: T) => VDOM) {
-  switch (d.tag) {
-    case "unsure":
-      return span(".unsure", f(d.contents));
-    case "sure":
-      return f(d.contents);
-    default:
-      // case "unknown":
-      return span("");
-  }
-}
-
-function triDagger<T>(d: Tri<T>, f: (t: T) => VDOM) {
-  switch (d.tag) {
-    case "unsure":
-      return span(".unsure", [
-        f(d.contents),
-        a({ props: { href: "#dagger" } }, sup("†")),
-      ]);
-    case "sure":
-      return f(d.contents);
-    default:
-      // case "unknown":
-      return span("");
+function maybeSpan<T>(x: T | undefined, f: (y: T) => VDOM) {
+  if (x) {
+    return f(x);
+  } else {
+    return span("");
   }
 }
 
@@ -116,29 +92,29 @@ interface GithubUser {
   avatar: string;
 }
 
-const flowdockAvatar = (config: Config, t: Tri<FlowdockUser>) =>
-  tri(t, fd =>
+const flowdockAvatar = (config: Config, t?: FlowdockUser) =>
+  maybeSpan(t, fd =>
     a({ props: { href: "https://www.flowdock.com/app/private/" + fd.id } }, [
       dataImg(config, fd.avatar),
     ]),
   );
 
-const flowdock = (t: Tri<FlowdockUser>) =>
-  triDagger(t, fd =>
+const flowdock = (t?: FlowdockUser) =>
+  maybeSpan(t, fd =>
     a({ props: { href: "https://www.flowdock.com/app/private/" + fd.id } }, [
       fd.nick,
     ]),
   );
 
-const githubAvatar = (config: Config, t: Tri<GithubUser>) =>
-  tri(t, gh =>
+const githubAvatar = (config: Config, t?: GithubUser) =>
+  maybeSpan(t, gh =>
     a({ props: { href: "https://github.com/" + gh.nick } }, [
       dataImg(config, gh.avatar),
     ]),
   );
 
-const github = (t: Tri<GithubUser>) =>
-  triDagger(t, gh =>
+const github = (t?: GithubUser) =>
+  maybeSpan(t, gh =>
     a({ props: { href: "https://github.com/" + gh.nick } }, [gh.nick]),
   );
 
@@ -183,14 +159,18 @@ const canonicalize = (str: string) =>
 const strContains = (str: string, needle: string) =>
   canonicalize(str).indexOf(canonicalize(needle)) !== -1;
 
-function triMatches<T, R>(t: Tri<T>, f: (t: T) => R): false | R {
-  return (t.tag === "sure" || t.tag === "unsure") && f(t.contents);
+function maybeMatches<T, R>(t: T | undefined, f: (t: T) => R): false | R {
+  if (t) {
+    return f(t);
+  } else {
+    return false;
+  }
 }
 
 interface Contact {
   name: string;
-  flowdock: Tri<FlowdockUser>;
-  github: Tri<GithubUser>;
+  flowdock?: FlowdockUser;
+  github?: GithubUser;
   login: string;
   first: string;
   last: string;
@@ -207,8 +187,8 @@ interface Contact {
 const contactMatches = (contact: Contact, needle: string) =>
   needle.length < 3 ||
   strContains(contact.name, needle) ||
-  triMatches(contact.flowdock, fd => strContains(fd.nick, needle)) ||
-  triMatches(contact.github, gh => strContains(gh.nick, needle));
+  maybeMatches(contact.flowdock, fd => strContains(fd.nick, needle)) ||
+  maybeMatches(contact.github, gh => strContains(gh.nick, needle));
 
 const contactMatchesStyle = (contact: Contact, needle: string) => ({
   display: contactMatches(contact, needle) ? "table-row" : "none",
