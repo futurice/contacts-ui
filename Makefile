@@ -35,4 +35,4 @@ docker : browserify
 	docker build --rm -t futurice/contacts:`git log --pretty=format:'%h' -n 1` .
 	@echo "=== DEPLOY WITH ==="
 	@echo docker push futurice/contacts:`git log --pretty=format:'%h' -n 1`
-	@echo futuswarm app:deploy --name contacts --image futurice/contacts --tag `git log --pretty=format:'%h' -n 1`
+	@echo appswarm app:deploy --name contacts --image futurice/contacts --tag `git log --pretty=format:'%h' -n 1`
