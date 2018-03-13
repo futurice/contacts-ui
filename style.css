@@ -7,6 +7,10 @@ h3 { font-size: 13pt; font-weight: bold; }
 .unsure, .unsure a { color: rgb(255, 82, 64); }
 .unsure a:hover { color: rgb(255, 130, 30); }
 
+.img-column img {
+	max-width: none;
+}
+
 #mosaic img {
   -webkit-transform:rotate(5deg);
   -moz-transform:rotate(5deg);
