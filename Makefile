@@ -20,7 +20,7 @@ dist :
 	mkdir -p dist
 
 browserify : dist src/main.ts
-	cp index.html style.css foundation.min.css dist/
+	cp index.html style.css favicon.ico foundation.min.css dist/
 	node_modules/.bin/browserify -p [ tsify ]  src/main.ts --outfile dist/main.js
 
 david :

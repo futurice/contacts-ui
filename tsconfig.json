@@ -10,7 +10,8 @@
     "outDir": "dist",
     "inlineSourceMap": true,
     "moduleResolution": "node",
-    "inlineSources": true
+    "inlineSources": true,
+    "skipLibCheck": true
   },
   "include": [
     "typings/**/*.d.ts",
