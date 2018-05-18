@@ -73,6 +73,18 @@ function dataImg(config: Config, url: string) {
   });
 }
 
+function avatarImg(config: Config, login: string, thumb: string) {
+  const srcUrl = config.AVATAR_BASEURL === ""
+    ? thumb
+    : config.AVATAR_BASEURL + "/fum/" + login;
+  return h("img", {
+    props: {
+      src: srcUrl,
+      width: 32,
+    },
+  });
+}
+
 function maybeSpan<T>(x: T | undefined, f: (y: T) => VDOM) {
   if (x) {
     return f(x);
@@ -213,7 +225,7 @@ const renderRow = (config: Config, needle: string, firstNameOnly: boolean) => (
       ".img-column",
       a(
         { props: { href: config.FUM_BASEURL + "/fum/users/" + contact.login } },
-        dataImg(config, contact.thumb),
+        avatarImg(config, contact.login, contact.thumb),
       ),
     ),
     td(
@@ -338,8 +350,7 @@ const mosaicImage = (config: Config, contact: Contact) =>
     img({
       props: {
         height: 50,
-        src:
-          config.AVATAR_BASEURL + "/avatar?size=50&grey&url=" + contact.thumb,
+        src: config.AVATAR_BASEURL + "/fum/" + contact.login + "?size=50&grey",
         title: contact.name,
         width: 50,
       },
