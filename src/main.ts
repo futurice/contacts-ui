@@ -48,11 +48,11 @@ const renderPhone = (phone: string) => {
   return a({ props: { href: "tel:" + phone } }, phone);
 };
 
-function separatedBy<T, S>(arr: T[], sep: S): Array<T | S> {
+function separatedBy<T, S>(arr: T[], sep: S): (T | S)[] {
   if (arr.length === 0) {
     return [];
   } else {
-    const res = [arr[0]] as Array<T | S>;
+    const res = [arr[0]] as (T | S)[];
     for (let i = 1; i < arr.length; i++) {
       res.push(sep);
       res.push(arr[i]);
@@ -62,9 +62,10 @@ function separatedBy<T, S>(arr: T[], sep: S): Array<T | S> {
 }
 
 function dataImg(config: Config, url: string) {
-  const srcUrl = config.AVATAR_BASEURL === ""
-    ? url
-    : config.AVATAR_BASEURL + "/avatar?url=" + encodeURIComponent(url);
+  const srcUrl =
+    config.AVATAR_BASEURL === ""
+      ? url
+      : config.AVATAR_BASEURL + "/avatar?url=" + encodeURIComponent(url);
   return h("img", {
     props: {
       src: srcUrl,
@@ -74,9 +75,10 @@ function dataImg(config: Config, url: string) {
 }
 
 function avatarImg(config: Config, login: string, thumb: string) {
-  const srcUrl = config.AVATAR_BASEURL === ""
-    ? thumb
-    : config.AVATAR_BASEURL + "/fum/" + login;
+  const srcUrl =
+    config.AVATAR_BASEURL === ""
+      ? thumb
+      : config.AVATAR_BASEURL + "/fum/" + login;
   return h("img", {
     props: {
       src: srcUrl,
@@ -93,8 +95,7 @@ function maybeSpan<T>(x: T | undefined, f: (y: T) => VDOM) {
   }
 }
 
-interface FlowdockUser {
-  id: string;
+interface SlackUser {
   avatar: string;
   nick: string;
 }
@@ -104,29 +105,20 @@ interface GithubUser {
   avatar: string;
 }
 
-const flowdockAvatar = (config: Config, t?: FlowdockUser) =>
-  maybeSpan(t, fd =>
-    a({ props: { href: "https://www.flowdock.com/app/private/" + fd.id } }, [
-      dataImg(config, fd.avatar),
-    ]),
-  );
+const slack = (t?: SlackUser) => maybeSpan(t, (sl) => span(sl.nick));
 
-const flowdock = (t?: FlowdockUser) =>
-  maybeSpan(t, fd =>
-    a({ props: { href: "https://www.flowdock.com/app/private/" + fd.id } }, [
-      fd.nick,
-    ]),
-  );
+const slackAvatar = (config: Config, t?: SlackUser) =>
+  maybeSpan(t, (fd) => dataImg(config, fd.avatar));
 
 const githubAvatar = (config: Config, t?: GithubUser) =>
-  maybeSpan(t, gh =>
+  maybeSpan(t, (gh) =>
     a({ props: { href: "https://github.com/" + gh.nick } }, [
       dataImg(config, gh.avatar),
     ]),
   );
 
 const github = (t?: GithubUser) =>
-  maybeSpan(t, gh =>
+  maybeSpan(t, (gh) =>
     a({ props: { href: "https://github.com/" + gh.nick } }, [gh.nick]),
   );
 
@@ -154,7 +146,7 @@ const tableHeader = tr([
   th("Team"),
   th("Office"),
   th(),
-  th("Flowdock"),
+  th("Slack"),
   th(),
   th("GitHub"),
   th("Mail"),
@@ -181,7 +173,7 @@ function maybeMatches<T, R>(t: T | undefined, f: (t: T) => R): false | R {
 
 interface Contact {
   name: string;
-  flowdock?: FlowdockUser;
+  slack?: SlackUser;
   github?: GithubUser;
   login: string;
   first: string;
@@ -199,8 +191,8 @@ interface Contact {
 const contactMatches = (contact: Contact, needle: string) =>
   needle.length < 3 ||
   strContains(contact.name, needle) ||
-  maybeMatches(contact.flowdock, fd => strContains(fd.nick, needle)) ||
-  maybeMatches(contact.github, gh => strContains(gh.nick, needle));
+  maybeMatches(contact.slack, (fd) => strContains(fd.nick, needle)) ||
+  maybeMatches(contact.github, (gh) => strContains(gh.nick, needle));
 
 const contactMatchesStyle = (contact: Contact, needle: string) => ({
   display: contactMatches(contact, needle) ? "table-row" : "none",
@@ -237,8 +229,8 @@ const renderRow = (config: Config, needle: string, firstNameOnly: boolean) => (
     td(separatedBy(contact.phones.map(renderPhone), " ")),
     td(contact.team || ""),
     td(contact.office || ""),
-    td(".img-column", flowdockAvatar(config, contact.flowdock)),
-    td(flowdock(contact.flowdock)),
+    td(".img-column", slackAvatar(config, contact.slack)),
+    td(slack(contact.slack)),
     td(".img-column", githubAvatar(config, contact.github)),
     td(github(contact.github)),
     td(a({ props: { href: "mailto:" + contact.email } }, "email")),
@@ -268,7 +260,7 @@ interface Stats {
 function calculateStats(contacts: Contact[]): Stats {
   const names: String2Number = {};
   const titles: String2Number = {};
-  contacts.forEach(contact => {
+  contacts.forEach((contact) => {
     const name = contact.first;
     const title = lastWord(contact.title).toLowerCase();
 
@@ -286,7 +278,7 @@ const renderStatsTable = (stats: String2Number) => {
   const pairs = _.chain(stats)
     .map((v: number, k: string) => [k, v])
     .filter(([k, v]) => v > 1 && k !== "")
-    .sortBy(x => -x[1]) // ([_k, v]) => -v
+    .sortBy((x) => -x[1]) // ([_k, v]) => -v
     .value();
 
   return table(
@@ -311,7 +303,9 @@ const renderTable = (
 
 // let's not name tribes "external' ;)
 const countExternals = (contacts: Contact[]) =>
-  _.chain(contacts).filter(c => c.external).value().length;
+  _.chain(contacts)
+    .filter((c) => c.external)
+    .value().length;
 
 const renderCounts = (contacts: Contact[]) => {
   const total = contacts.length;
@@ -362,7 +356,7 @@ const iddqdRender = (config: Config, contacts: Contact[]) =>
     "#mosaic",
     contacts
       .filter((contact: Contact) => !contact.thumb.match(/default_portrait/))
-      .map(x => mosaicImage(config, x)),
+      .map((x) => mosaicImage(config, x)),
   );
 
 function render(
@@ -383,8 +377,8 @@ function codeSource(
 ): Stream<boolean> {
   let index = 0;
   return keyPresses
-    .map(ev => String.fromCharCode(ev.which))
-    .map(c => {
+    .map((ev) => String.fromCharCode(ev.which))
+    .map((c) => {
       if (c === code[index++]) {
         return index === code.length;
       } else {
@@ -409,29 +403,26 @@ function main(responses: Sources) {
     { category: "contacts", url: CONTACTS_URL },
   );
 
-  const config$: Stream<Config> = responses.HTTP
-    .select("config")
+  const config$: Stream<Config> = responses.HTTP.select("config")
     .flatten()
-    .map(res => {
+    .map((res) => {
       // console.info("Got config", res.body);
       return res.body;
     });
 
-  const filter$ = responses.DOM
-    .select(".filter")
+  const filter$ = responses.DOM.select(".filter")
     .events("input")
-    .map(ev => (ev.target as HTMLInputElement).value)
+    .map((ev) => (ev.target as HTMLInputElement).value)
     .startWith("")
-    .map(needle => (needle.trim().length < 3 ? "" : needle.trim()))
+    .map((needle) => (needle.trim().length < 3 ? "" : needle.trim()))
     .compose(dropRepeats());
 
   const iddqd$ = codeSource(responses.keyPresses, "iddqd");
   const idclip$ = codeSource(responses.keyPresses, "idclip");
 
-  const contacts$: Stream<Contact[]> = responses.HTTP
-    .select("contacts")
+  const contacts$: Stream<Contact[]> = responses.HTTP.select("contacts")
     .flatten()
-    .map(res => {
+    .map((res) => {
       // console.info("Got contacts");
       return res.body;
     })
@@ -439,7 +430,7 @@ function main(responses: Sources) {
 
   const vtree$ = xs
     .combine(config$, contacts$, filter$, iddqd$, idclip$)
-    .map(args => render.apply(null, args));
+    .map((args) => render.apply(null, args));
 
   return {
     DOM: vtree$,

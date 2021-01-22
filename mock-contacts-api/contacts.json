@@ -2,9 +2,8 @@
     {
         "email": "spam-here@futurice.com",
         "first": "Futu",
-        "flowdock": {
+        "slack": {
             "avatar": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
-            "id": 0,
             "nick": "futu"
         },
         "image": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
@@ -23,10 +22,9 @@
     {
         "email": "spam-here@futurice.com",
         "first": "Futu",
-        "flowdock": {
+        "slack": {
             "avatar": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
-            "id": 0,
-            "nick": "futu"
+            "nick": "futu2"
         },
         "github": {
           "nick": "gh-nick1",
@@ -49,10 +47,9 @@
     {
         "email": "spam-here@futurice.com",
         "first": "Futu",
-        "flowdock": {
-        "avatar": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
-        "id": 0,
-        "nick": "futu"
+        "slack": {
+            "avatar": "https://avatars3.githubusercontent.com/u/852157?v=3&s=200",
+            "nick": "futu3"
         },
         "github": {
             "nick": "gh-nick",
