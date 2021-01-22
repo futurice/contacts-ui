@@ -48,11 +48,11 @@ const renderPhone = (phone: string) => {
   return a({ props: { href: "tel:" + phone } }, phone);
 };
 
-function separatedBy<T, S>(arr: T[], sep: S): Array<T | S> {
+function separatedBy<T, S>(arr: T[], sep: S): (T | S)[] {
   if (arr.length === 0) {
     return [];
   } else {
-    const res = [arr[0]] as Array<T | S>;
+    const res = [arr[0]] as (T | S)[];
     for (let i = 1; i < arr.length; i++) {
       res.push(sep);
       res.push(arr[i]);
