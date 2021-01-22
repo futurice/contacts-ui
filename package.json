@@ -3,7 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "author": "Oleg Grenrus",
-  "contributors": [{ "name": "Toni Okuogume"}],
+  "contributors": [
+    {
+      "name": "Toni Okuogume"
+    }
+  ],
   "license": "BSD-3-Clause",
   "dependencies": {
     "@cycle/dom": "^18.0.0",
